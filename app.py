@@ -27,7 +27,7 @@ def index():
 
 @get('/task')
 def task():
-    return jtemplate('views/task', loggedIn="true", name="me gusta", title="foo")
+    return jtemplate('views/task', title="tasklist", loggedIn="true", name="me gusta")
 
 
 @route('/:path#.+#', name='public')
