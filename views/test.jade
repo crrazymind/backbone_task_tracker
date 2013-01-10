@@ -1,0 +1,23 @@
+!!! 5
+html
+  head
+  body   
+    header
+      div(class='content-wrapper')
+        div(class="float-left")
+          p(class="site-title")
+            a(href="/") you are here.
+        div(class="float-right")
+          section(class="navbar-form", id="login")
+            ul(id="menu", class="nav nav-pills")
+    #body!= body
+      
+    footer
+      div(class="content-wrapper")
+        div(class="float-left")
+          p &copy; 
+        div(class="float-right")
+          ul#social
+            li
+              a(href="http://facebook.com", class="facebook") Facebook
+              a(href="http://twitter.com", class="twitter") Twitter

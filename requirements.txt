@@ -1,2 +1,4 @@
 Bottle>=0.1
 PyMongo>=0.1
+Jinja2>=0.1
+BSON>=0.1
