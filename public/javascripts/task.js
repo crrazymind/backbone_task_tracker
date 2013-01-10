@@ -83,18 +83,29 @@ BaseView.extend = Backbone.View.extend;
 		idAttribute: '_id',
 		silent : true,
 		sync: ownSync,
+		url : "http://localhost:5000/api",
 		initialize: function(){
+			_.bindAll(this, "fetchSuccess")
 			this.name = "AppModel";
 			this.modelId = $.taskList.globalId++;
-			//console.log("application model initialize");
-		}
+			this.fetch({success : this.fetchSuccess});
+		},
+		fetchSuccess : function(){}
 	});
 	
 	$.taskList.tasksCollection = Backbone.Collection.extend({
-		model: $.taskList.AppModel,
 		url : "http://localhost:5000/api",
+		//model: $.taskList.AppModel,
 		initialize: function(model, options) {
 			this.name = "tasksCollection";
+			_.bindAll(this, "loadSucess")
+			this.add(model);
+		},
+		loadSucess: function(root, data, status){
+			console.log(arguments);
+		},
+		loadError: function(root, data, status){
+			console.log("error: ", root);
 		},
 		sync: ownSync
 	});
@@ -118,15 +129,17 @@ BaseView.extend = Backbone.View.extend;
 		},
 		initialize: function(){
 			this.name = "TaskGenerator view";
-			this.bindTo(this.model, 'reset', this.render);
+			_.bindAll(this, "render", "fetchError")
+			this.bindTo(this.model, 'change', this.render);
+			//this.bindTo(this.model, 'destroy', this.render);
 			this.bindTo(this.model, 'error', this.fetchError);
-			this.model.fetch();
 		},
 		fetchError: function(model, response) {
 			console.log('fetch error ', response);
 		},
 		render: function(){
-			var items = this.model.toJSON()[0].items;
+			var items = this.collection.toJSON()[0].items;
+			console.log("render: " ,items)
 			if(!items) return false;
 			$(this.el).append(_.template($('#task_header_template').html()));
 			for(var _i=0; _i < items.length; _i++){
@@ -345,12 +358,13 @@ $(window).load(function(){
 			    app_router.on('route:renderSelected', function (id) {
 			    	console.log($.taskList.detailsCollection)
 			        var detailsCollection = $.taskList.app.detailsCollection = new $.taskList.detailsCollection(new $.taskList.AppModel, {hashCode:"showDetails/"+id});
-			    	var detailsApp = $.taskList.app.detailsView = new $.taskList.TaskGenerator({model: detailsCollection});
+			    	var detailsApp = $.taskList.app.detailsView = new $.taskList.TaskGenerator({collection: detailsCollection});
 			    	$("#todoapp").empty().html(detailsApp.el);
 				});
 			    app_router.on('route:defaultRoute', function (actions) {
-			    	var appCollection = $.taskList.app.appCollection = new $.taskList.tasksCollection;
-			    	var indexApp = $.taskList.app.globalView = new $.taskList.TaskGenerator({model: appCollection});
+			    	var appModel = new $.taskList.AppModel;
+			    	var appCollection = $.taskList.app.appCollection = new $.taskList.tasksCollection(appModel);
+			    	var indexApp = $.taskList.app.globalView = new $.taskList.TaskGenerator({model: appModel, collection: appCollection});
 			    	//new $.taskList.utils.SourceView({model: new $.taskList.AppModel, collection : new $.taskList.tasksCollection})
 					$("#todoapp").html(indexApp.el);
 			    });
@@ -359,7 +373,6 @@ $(window).load(function(){
 	    	}
 	    }
     }
-
     var tsk = new appCore().init();
 
 })
