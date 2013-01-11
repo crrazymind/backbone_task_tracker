@@ -1,7 +1,7 @@
 define([
 		'jquery', 
 		'backbone',
-		'underscore', 
+		'underscore',
 		'utils/BaseView',
 		'models/ItemModel',
 		'models/NewItemModel',
@@ -41,7 +41,7 @@ function($, Backbone, _, BaseView, ItemModel, NewItemModel, SingleTask){
 			$(this.el).append(one.render().el);
 		},
 		addNew : function(){
-			var newModel = new $.taskList.NewItemModel({}, this);
+			var newModel = new NewItemModel({}, this);
 			newModel.validate();
 			var one = new SingleTask({model: newModel});
 			var newOne = $(one.render().el);

@@ -18,6 +18,8 @@ from bson import json_util
 from bson.objectid import ObjectId
 from jadeview import jade_view as view, jade_template as jtemplate
 from bottle import static_file
+from bottle import run
+from rest import BackBoneRest
 
 
 @get('/')
@@ -39,6 +41,11 @@ def public(path):
 @get('/hello')
 def hello_page():
     return bottle.template("index")
+
+
+#dataSource = BackBoneRest()
+#dataSource.prepare()
+#dataSource.run()
 
 bottle.debug(True)
 port = int(os.environ.get("PORT", 5300))

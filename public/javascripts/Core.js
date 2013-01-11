@@ -39,6 +39,8 @@ define(config, function($, Backbone, _, BaseView, AppModel, TasksCollection, Det
 			    	var indexApp = new TaskGenerator({model: appModel, collection: appCollection});
 			    	//new $.taskList.utils.SourceView({model: new $.taskList.AppModel, collection : new $.taskList.tasksCollection})
 					$("#todoapp").html(indexApp.el);
+					$.taskList = {};
+					$.taskList.updateQueue = {}//.stack = [];
 			    });
 			    Backbone.history.start();
 			    return this;
