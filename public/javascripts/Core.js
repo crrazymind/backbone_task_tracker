@@ -36,7 +36,7 @@ define(config, function($, Backbone, _, BaseView, AppModel, TasksCollection, Det
 			    app_router.on('route:defaultRoute', function (actions) {
 			    	var appModel = new AppModel;
 			    	var appCollection = new TasksCollection(appModel);
-			    	var indexApp = TaskGenerator({model: appModel, collection: appCollection});
+			    	var indexApp = new TaskGenerator({model: appModel, collection: appCollection});
 			    	//new $.taskList.utils.SourceView({model: new $.taskList.AppModel, collection : new $.taskList.tasksCollection})
 					$("#todoapp").html(indexApp.el);
 			    });

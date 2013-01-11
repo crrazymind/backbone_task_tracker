@@ -11,7 +11,8 @@ var config = ['jquery',
 // This is the main entry point for the App
 define(config, function($, Backbone, _,Namespace, Core/*BaseView, AppModel, TasksCollection, TaskGenerator*/){
 	var init = function(){
-		console.log(new Core);
+		var app = new Core;
+		app.init();
 		//console.log('args: ', [].splice.call(arguments,0));
 
 	};

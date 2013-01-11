@@ -2,8 +2,11 @@ define([
 		'jquery', 
 		'backbone',
 		'underscore', 
-		'utils/BaseView'], 
-function($, Backbone, _, BaseView){
+		'utils/BaseView',
+		'models/ItemModel',
+		'models/NewItemModel',
+		'views/SingleTask'], 
+function($, Backbone, _, BaseView, ItemModel, NewItemModel, SingleTask){
 	TaskGenerator = BaseView.extend({
 		template: _.template($('#my_template').html()),
 		el: '<div class="app"></div>',
@@ -33,14 +36,14 @@ function($, Backbone, _, BaseView){
 			return this;
 		},
 		addChild: function(data){
-			var itemModel = new $.taskList.ItemModel(data, this);
-			var one = new $.taskList.itemThing({data:data, model:itemModel});
+			var itemModel = new ItemModel(data, this);
+			var one = new SingleTask({data:data, model:itemModel});
 			$(this.el).append(one.render().el);
 		},
 		addNew : function(){
 			var newModel = new $.taskList.NewItemModel({}, this);
 			newModel.validate();
-			var one = new $.taskList.itemThing({model: newModel});
+			var one = new SingleTask({model: newModel});
 			var newOne = $(one.render().el);
 			newOne.insertBefore($(this.el).find('.view:last'));
 			newOne.hide();
