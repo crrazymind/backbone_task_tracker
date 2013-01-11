@@ -9,11 +9,12 @@ html
     link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/stylesheets/bootstrap.css')
 block javascripts
-    script(src='/javascripts/jquery.js')
-    script(src='/javascripts/underscore.js')
-    script(src='/javascripts/backbone.js')
+    script(data-main="javascripts/config", src='/javascripts/require-jquery.js')
+    //script(src='/javascripts/jquery.js')
+    //script(src='/javascripts/underscore.js')
+    //script(src='/javascripts/backbone.js')
     //script(src='/javascripts/backbone-relational.js')
-    script(src='/javascripts/task.js')
+    //script(src='/javascripts/task.js')
   body   
     header
       div(class='content-wrapper')
