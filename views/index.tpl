@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>index</title>
-    <script type="text/javascript" src="/javascripts/jquery-1.7.min.js"></script>
+  	% if defined('user'):
+  		<title>Hi {{user}}</title>
+  	%else:
+  		<title>Hi Noname</title>
+  	%end
+    <script type="text/javascript" src="/javascripts/jquery.js"></script>
     <style type="text/css">
 
     </style>

@@ -20,6 +20,7 @@ connection_string = "mongodb://admin:mongo_admin@staff.mongohq.com:10009/app3605
 connection = pymongo.Connection(connection_string, safe=True)
 db = connection['app3605825']
 data_shema = ["cost", "done", "duration", "eta", "link", "title"]
+port = int(os.environ.get("PORT", 5000))
 
 
 def makeJson(data):
@@ -179,8 +180,9 @@ class BackBoneRest():
 
     def run(self):
         bottle.debug(True)
-        port = int(os.environ.get("PORT", 5000))
         bottle.run(host='0.0.0.0', port=port, reloader='true', interval=0.1)
         #bottle.run(host='127.0.0.1', port=port)
 
 #BackBoneRest.run()
+if __name__ == '__main__':
+    bottle.run(host='0.0.0.0', port=port, reloader='true', interval=0.1)
