@@ -18,11 +18,12 @@ from jadeview import jade_view as view, jade_template as jtemplate
 from rest import BackBoneRest
 from auth import tryAuth
 import md5
+import hashlib
 passPhrase = '0'
-accTypes = ["admin", "user", "noname"]
+accTypes = ["admin", "user", "Noname"]
 accTypeHolder = dict()
 for item in accTypes:
-    accTypeHolder[md5.new(item).digest()] = item
+    accTypeHolder[md5.new(item).hexdigest()] = item
 
 userStack = dict({"200820e3227815ed1756a6b531e7e0d2": {"usertype": "user", "userid": "1", "username": "qwe", "pwd": "202cb962ac59075b964b07152d234b70"}})
 
@@ -34,13 +35,17 @@ sessionHolder = dict({
 
 @get('/')
 def index():
-    user = auth.checkUser(request)
-    return bottle.template("index", user=user)
+    username = auth.checkUserCookie()
+    return bottle.template("index", user=username)
 
 
 @get('/task')
 def task():
-    return jtemplate('views/task', title="tasklist", loggedIn="true", name="me gusta")
+    username = auth.checkUserCookie()
+    if username != "Noname":
+        return jtemplate('views/task', title="tasklist", loggedIn="true", name="me gusta")
+    else:
+        bottle.redirect("/login")
 
 
 @route('/:path#.+#', name='public')
@@ -50,28 +55,27 @@ def public(path):
 
 
 @get('/hello')
+@get('/goaway')
 def hello_page():
-    return bottle.template("index", user=user)
+    return bottle.template("index", user="ololo")
+
+
+@get('/tryagain')
+def tryagain():
+    return jtemplate('views/login', title="Login please", error="Invalid credentials", name="me gusta")
 
 
 @get('/session')
 def session():
     #user = auth.checkUser(request)
-    user = auth.getUser(user, request, response)
-    print "USER: ", user
-    return bottle.template("index", user=user)
-
-
-@get('/loginme11')
-def login():
-    user = auth.checkUser(request)
-    auth.initUser(request, response, "admin")
-    bottle.redirect("/session")
+    username = auth.checkUserCookie()
+    print "USER: ", username
+    return bottle.template("index", user=username)
 
 
 @get('/loginme')
-def login():
-    user = auth.checkUser(request)
+def loginme():
+    #user = auth.checkUser(request)
     user = dict({"usertype": "admin", "userid": "1234567899"})
     print user
     auth.initUser(request, response, user)
@@ -79,18 +83,18 @@ def login():
 
 
 @post('/sendCred')
-def login():
+def sendCred():
     user = auth.getUser()
-    if auth.checkUser(user):
+    if auth.validateUser(user):
         auth.initUser(request, response, user)
         bottle.redirect("/session")
     else:
-        bottle.redirect("/login")
+        bottle.redirect("/tryagain")
 
 
 @get('/login')
 def login():
-    return jtemplate('views/login', title="Login please", loggedIn="false", name="me gusta")
+    return jtemplate('views/login', title="Login please", name="me gusta")
 
 
 @get('/logout')
@@ -101,15 +105,20 @@ def logout():
 
 connection_string = "mongodb://me:qwe123@alex.mongohq.com:10076/app9812962"
 connection = pymongo.Connection(connection_string, safe=True)
-db = connection['app9812962']
+db_cred = connection['app9812962']
+
+
+connection_string2 = "mongodb://me:qwe123@alex.mongohq.com:10076/app9812962"
+connection2 = pymongo.Connection(connection_string2, safe=True)
+db_auth = connection2['app9812962']
 
 
 class tryAuth():
     def __init__(self):
-        self.db = db
+        self.db_cred = db_cred
 
     def prepare():
-        print self.db
+        print self.db_cred
 
     def getUser123(self, user, request, response):
         if self.validateUser(user, user):
@@ -118,27 +127,23 @@ class tryAuth():
             return user
 
     def validateUser(self, user):
-        #user.username
-        bduser = self.db.session.find_one({"userid": md5.new(user["username"] + user["pwd"]).digest()})
-        print dbuser
+        data = md5.new(md5.new(user["username"]).hexdigest() + user["pwd"]).hexdigest()
+        #bduser = self.db.session.find_one({"userid": str(md5.new(user["username"] + user["pwd"]).hexdigest())})
+        bduser = db_auth.sessions.find_one({"userid": data})
+        print bduser
         if bduser:
             return True
+        else:
+            return False
 
     def initUser(self, request, response, user):
-        #self.checkUser()
         sessionHolder[user["userid"]] = user
-        response.set_cookie("account", md5.new(user["usertype"]).digest(), secret=passPhrase)
-        response.set_cookie("userName", md5.new(user["username"]).digest(), secret=passPhrase)
+        response.set_cookie("account", md5.new(user["usertype"]).hexdigest(), secret=passPhrase)
+        response.set_cookie("userName", md5.new(user["username"]).hexdigest(), secret=passPhrase)
         print sessionHolder
 
     def logoffUser(self, request, response):
         response.set_cookie("account", "", secret=passPhrase)
-
-    def checkUser(self, user):
-        if self.validateUser(user):
-            return True
-        else:
-            return False
 
     def getUser(self):
         username = request.forms.get("login")
@@ -146,11 +151,11 @@ class tryAuth():
         user = dict({"usertype": "", "username": "", "userid": "", "pwd": ""})
         user["usertype"] = "user"
         user["username"] = username
-        user["userid"] = md5.new(username + pwd).digest()
-        user["pwd"] = md5.new(pwd).digest()
+        user["userid"] = md5.new(username + pwd).hexdigest()
+        user["pwd"] = md5.new(pwd).hexdigest()
         return user
 
-    def checkUser1(self, request):
+    def checkUserCookie(self):
         username = request.get_cookie("account", secret=passPhrase)
         if username:
             if accTypeHolder[username]:
@@ -161,7 +166,7 @@ class tryAuth():
             return auth.setNonameCookie()
 
     def setNonameCookie(self):
-        response.set_cookie("account", md5.new("noname").digest(), secret=passPhrase)
+        response.set_cookie("account", md5.new("Noname").hexdigest(), secret=passPhrase)
 
     def run(self):
         print "run"

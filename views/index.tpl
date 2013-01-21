@@ -6,7 +6,6 @@
   	%else:
   		<title>Hi Noname</title>
   	%end
-    <script type="text/javascript" src="/javascripts/jquery.js"></script>
     <style type="text/css">
 
     </style>

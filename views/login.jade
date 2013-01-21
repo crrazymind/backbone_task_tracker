@@ -5,13 +5,13 @@ html
         title Express Starter Template
     - else 
         title= title
+    - if not error
+          error = 'undefined'
 block javascripts
-    //script(data-main="javascripts/config", src='/javascripts/require-jquery.js')
-    //script(src='/javascripts/jquery.js')
-    //script(src='/javascripts/underscore.js')
-    //script(src='/javascripts/backbone.js')
-    //script(src='/javascripts/backbone-relational.js')
-    //script(src='/javascripts/task.js')
+    script(data-main="javascripts/config", src='/javascripts/libs/jquery.js')
+    //include default stylesheets and any view stylesheets
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/bootstrap.css')
   body   
     header
       div(class='content-wrapper')
@@ -24,7 +24,11 @@ block javascripts
              
     section(id="body")
         section(class="main-content")
-            div(class="login container")
+            div(class="login container", style="width:400px;")
+                - if (error == 'undefined')
+                    div
+                - else
+                    div(class="alert alert-error")= error
                 form(action="/sendCred", class="form-horizontal", method="POST")
                     div(class="row control-group")
                         label(class="control-label", for="login") Login
@@ -49,6 +53,3 @@ block javascripts
             li
               a(href="http://facebook.com", class="facebook") Facebook
               a(href="http://twitter.com", class="twitter") Twitter
-      // include default stylesheets and any view stylesheets
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    link(rel='stylesheet', href='/stylesheets/bootstrap.css')
